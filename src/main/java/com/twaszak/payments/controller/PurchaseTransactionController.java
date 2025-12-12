@@ -1,7 +1,11 @@
 package com.twaszak.payments.controller;
 
+import com.twaszak.payments.dto.CurrencyConversionDTO;
+import com.twaszak.payments.dto.CurrencyConversionResponse;
 import com.twaszak.payments.dto.PurchaseTransactionDTO;
 import com.twaszak.payments.dto.PurchaseTransactionResponse;
+import com.twaszak.payments.exceptions.NoCurrencyDataException;
+import com.twaszak.payments.exceptions.NoTransactionPresent;
 import com.twaszak.payments.service.PurchaseTransactionService;
 import jakarta.validation.*;
 import org.slf4j.Logger;
@@ -39,12 +43,12 @@ public class PurchaseTransactionController {
      * @param  {@link PaymentDTO}
      * @return {@link PurchaseTransactionResponse}
      */
-    @PostMapping("/submit")
-    public ResponseEntity<PurchaseTransactionResponse> submitPayment(@Valid @RequestBody PurchaseTransactionDTO paymentDTO) {
+    @PostMapping("/purchase")
+    public ResponseEntity<PurchaseTransactionResponse> addPurchaseTransaction(@Valid @RequestBody PurchaseTransactionDTO paymentDTO) {
         logger.debug("Received request to submit payment: {}", paymentDTO);
 
         try {
-           return ResponseEntity.ok(new PurchaseTransactionResponse( transactionService.submitTransaction(paymentDTO)));
+           return ResponseEntity.ok(new PurchaseTransactionResponse( transactionService.addTransaction(paymentDTO)));
         }
         catch (Exception ex) {
             logger.error(ex.getMessage(), ex);
@@ -52,6 +56,35 @@ public class PurchaseTransactionController {
         }
         finally {
             logger.debug("Received request to submit payment: {}", paymentDTO);
+        }
+    }
+
+    @GetMapping("/purchase/{id}")
+    public ResponseEntity getPurchaseTransaction(@PathVariable Long id, @Valid @RequestBody CurrencyConversionDTO currencyConversionDTO) {
+
+
+        logger.debug("Received request to submit payment: {}", currencyConversionDTO);
+        try {
+            return ResponseEntity.ok(transactionService.getConvertedPurchaseTransaction(id,currencyConversionDTO));
+        }
+        catch (NoCurrencyDataException ex)
+        {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("No currency data for country: %s or currency: %s could be found"
+                            .formatted(currencyConversionDTO.getCountry(), currencyConversionDTO.getCurrency()));
+        }
+        catch (NoTransactionPresent e)
+        {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("No transaction data with id: %s could be found"
+                            .formatted(id));
+        }
+        catch (Exception ex) {
+            logger.error(ex.getMessage(), ex);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+        finally {
+            logger.debug("Received request to submit payment: {}", currencyConversionDTO);
         }
     }
 
