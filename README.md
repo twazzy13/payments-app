@@ -17,7 +17,7 @@ Build the project using
 ## Endpoints
 
 ### /api/v1/purchase
-`````    * `POST` Create a new purchase transaction
+    * `POST` Create a new purchase transaction
 #### Request 
 
 | Field                          | Data Type |                                                                                    Requirements |
