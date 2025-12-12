@@ -3,16 +3,41 @@ Application for storing and receiving transactions in their respective currency
 
 ## Setup
 In order to run this project you will need:
- * Java 25 or higher
- * Apache Maven 3.9.11 or higher
- * git
+ * Java 25 or higher - https://jdk.java.net/25/
+ * Apache Maven 3.9.11 or higher - https://maven.apache.org/download.cgi
+ * Git - https://git-scm.com/install/
 
 Download the project using git
 
+    $ git clone https://github.com/twazzy13/payments-app.git
+
 Build the project using
+
     $ mvn clean install
 
 
+## Docker
+* Required Docker to be installed
+  https://www.docker.com/get-started/
+
+### Getting started
+
+To build a docker image, first build the project:
+
+    $ mvn clean install
+
+To build a docker image, provided the version of the app your just built
+
+    $ Docker build . --build-arg APP_VERSION=0.0.1-SNAPSHOT -t payment-app:latest
+
+Run the container on port 8080:
+
+    $ docker run -d -p 8080:8080 --name payment-app  payment-app:latest
+
+To stop the image, find the container id:
+
+    $ docker ps
+    $ docker stop ${container id}
 
 ## Endpoints
 
@@ -121,25 +146,4 @@ http://localhost:8080/actuator/health
 
 
 
-## Docker
- * Required Docker to be installed
 
-
-### Getting started
-    
-To build a docker image, first build the project:
-
-    $ mvn clean install
-
-To build a docker image, provided the version of the app your just built
-    
-    $ Docker build . --build-arg APP_VERSION=0.0.1-SNAPSHOT -t payment-app:latest
-
-Run the container on port 8080:
-
-    $ docker run -d -p 8080:8080 --name payment-app-5  payment-app:latest
-
-To stop the image, find the container id:
-
-    $ docker ps
-    $ docker stop ${container id}
