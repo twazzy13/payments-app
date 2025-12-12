@@ -1,5 +1,6 @@
 package com.twaszak.payments.controller;
 
+import com.jayway.jsonpath.JsonPath;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,10 +11,12 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
 @SpringBootTest
 @AutoConfigureMockMvc
 @ExtendWith(SpringExtension.class)
@@ -86,4 +89,109 @@ class PurchaseTransactionControllerTest {
 
     }
 
+    @Test
+    void submit_payment_and_convert_currency_for_country() throws Exception {
+
+        MvcResult result = mockMvc.perform(post("/api/v1/purchase")
+                        .content("{\"description\": \"test\", \"purchaseTransactionDate\": \"2025-09-30T00:00:00\",\"purchaseAmount\": 9303.325}")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("description").value("test"))
+                .andExpect(jsonPath("purchaseTransactionDate").value("2025-09-30T00:00:00"))
+                .andExpect(jsonPath("purchaseAmount").value(9303.33))
+                .andExpect(jsonPath("id").isNotEmpty()).andReturn();
+
+
+        Integer id = JsonPath.read(result.getResponse().getContentAsString(), "id");
+
+
+        mockMvc.perform(get("/api/v1/purchase/{id}", id)
+                        .content("{\"country\": \"Afghanistan\", \"currency\": \"\"}")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("description").value("test"))
+                .andExpect(jsonPath("purchaseTransactionDate").value("2025-09-30T00:00:00"))
+                .andExpect(jsonPath("purchaseAmountUSD").value(9303.33))
+                .andExpect(jsonPath("id").value(id))
+                .andExpect(jsonPath("exchangeRate").value(67.33))
+                .andExpect(jsonPath("convertedPurchaseAmount").value(626393.21));
+
+
+    }
+    @Test
+    void submit_payment_and_convert_currency_for_currency() throws Exception {
+
+        MvcResult result = mockMvc.perform(post("/api/v1/purchase")
+                        .content("{\"description\": \"test\", \"purchaseTransactionDate\": \"2025-09-30T00:00:00\",\"purchaseAmount\": 1000.50}")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("description").value("test"))
+                .andExpect(jsonPath("purchaseTransactionDate").value("2025-09-30T00:00:00"))
+                .andExpect(jsonPath("purchaseAmount").value(1000.50))
+                .andExpect(jsonPath("id").isNotEmpty()).andReturn();
+
+
+        Integer id = JsonPath.read(result.getResponse().getContentAsString(), "id");
+
+
+        mockMvc.perform(get("/api/v1/purchase/{id}", id)
+                        .content("{\"country\": \"\", \"currency\": \"Euro\"}")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("description").value("test"))
+                .andExpect(jsonPath("purchaseTransactionDate").value("2025-09-30T00:00:00"))
+                .andExpect(jsonPath("purchaseAmountUSD").value(1000.50))
+                .andExpect(jsonPath("id").value(id))
+                .andExpect(jsonPath("exchangeRate").value(0.852))
+                .andExpect(jsonPath("convertedPurchaseAmount").value(852.43));
+
+
+    }
+    @Test
+    void submit_payment_and_convert_currency_with_no_exchange_rate_existing_for_country() throws Exception {
+
+        MvcResult result = mockMvc.perform(post("/api/v1/purchase")
+                        .content("{\"description\": \"test\", \"purchaseTransactionDate\": \"2025-06-30T00:00:00\",\"purchaseAmount\": 9303.325}")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("description").value("test"))
+                .andExpect(jsonPath("purchaseTransactionDate").value("2025-06-30T00:00:00"))
+                .andExpect(jsonPath("purchaseAmount").value(9303.33))
+                .andExpect(jsonPath("id").isNotEmpty()).andReturn();
+
+
+        Integer id = JsonPath.read(result.getResponse().getContentAsString(), "id");
+
+
+        mockMvc.perform(get("/api/v1/purchase/{id}", id)
+                        .content("{\"country\": \"Afghanistans\", \"currency\": \"\"}")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().is5xxServerError())
+                .andExpect(content().string("No currency data for country: Afghanistans or currency:  could be found"));
+
+    }
+
+    @Test
+    void submit_payment_and_convert_currency_with_no_exchange_rate_existing_for_currency() throws Exception {
+
+        MvcResult result = mockMvc.perform(post("/api/v1/purchase")
+                        .content("{\"description\": \"test\", \"purchaseTransactionDate\": \"2025-06-30T00:00:00\",\"purchaseAmount\": 9303.325}")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("description").value("test"))
+                .andExpect(jsonPath("purchaseTransactionDate").value("2025-06-30T00:00:00"))
+                .andExpect(jsonPath("purchaseAmount").value(9303.33))
+                .andExpect(jsonPath("id").isNotEmpty()).andReturn();
+
+
+        Integer id = JsonPath.read(result.getResponse().getContentAsString(), "id");
+
+
+        mockMvc.perform(get("/api/v1/purchase/{id}", id)
+                        .content("{\"country\": \"\", \"currency\": \"EUROTest\"}")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().is5xxServerError())
+                .andExpect(content().string("No currency data for country:  or currency: EUROTest could be found"));
+
+    }
 }

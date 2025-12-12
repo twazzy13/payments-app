@@ -15,7 +15,10 @@ public class CurrencyConversionValidator implements ConstraintValidator<Currency
     public boolean isValid(CurrencyConversionDTO currencyConversionDTO, ConstraintValidatorContext cxt) {
 
 
-        return !(currencyConversionDTO.getCountry().isEmpty() && currencyConversionDTO.getCountry().get().isEmpty())
-                || !currencyConversionDTO.getCurrency().isEmpty();
+        if((currencyConversionDTO.getCountry() == null || currencyConversionDTO.getCountry().isEmpty()) &&  (currencyConversionDTO.getCurrency() == null || currencyConversionDTO.getCurrency().isEmpty() )) {
+            return false;
+        }
+
+        return true;
     }
 }

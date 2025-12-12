@@ -51,7 +51,7 @@ public class FiscalDataProvider {
         ObjectMapper objectMapper = new ObjectMapper();
 
         UriComponentsBuilder uriBuilder = createUriComponentsBuilder(exchange_date, country, currency);
-        logger.info("retrieving fiscal data from "+uriBuilder.toString());
+        logger.info("retrieving fiscal data from "+uriBuilder.toUriString());
         ResponseEntity<String> response = restTemplate.getForEntity(uriBuilder.toUriString(), String.class);
         Map<String, Object> data = objectMapper.readValue(response.getBody(), Map.class);
         List<CurrencyConversionDetails> result = new ArrayList<>();
@@ -78,8 +78,10 @@ public class FiscalDataProvider {
         queryBuilder.append(",record_date:gte:").append(formatter.format(getSixMonthsAgo(exchange_date)));
 
         //we only need country or currency in order to get the exchange rate, based on their presence generate the url
+
         country.ifPresent(s -> queryBuilder.append(",country:eq:").append(s));
         currency.ifPresent(s -> queryBuilder.append(",currency:eq:").append(s));
+
         uriBuilder.query(queryBuilder.toString());
         return uriBuilder;
     }

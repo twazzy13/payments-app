@@ -13,6 +13,6 @@ import java.util.Optional;
 @Getter
 public class CurrencyConversionDTO {
 
-    private Optional<String> country;
-    private Optional<String> currency;
+    private String country;
+    private String currency;
 }

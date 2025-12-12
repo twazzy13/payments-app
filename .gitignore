@@ -32,4 +32,6 @@ target/*
 hs_err_pid*
 replay_pid*
 
+#h2 db
+*.mv.db
 .gitattributes

@@ -12,6 +12,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * This service is responsible for grabbing currency conversion data for a purchase transaction and providing a currency conversion from USD to the respective country or currency.
@@ -36,7 +37,7 @@ public class CurrencyConversionService {
 
         // get currency exchange rates for the last six months.
         List<CurrencyConversionDetails> details = fiscalDataRepository.getConversionForLastSixMonths(purchaseTransaction.getPurchaseTransactionDate(),
-                currencyConversionDTO.getCountry(),currencyConversionDTO.getCurrency());
+                Optional.ofNullable(currencyConversionDTO.getCountry()).filter(s -> !s.isEmpty()),Optional.ofNullable(currencyConversionDTO.getCurrency()).filter(s -> !s.isEmpty()));
 
         //get the most recent conversions
         CurrencyConversionDetails detail = details.stream().max(Comparator.comparing(CurrencyConversionDetails::getRecordDate)).get();
