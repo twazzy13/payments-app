@@ -1,10 +1,7 @@
 package com.twaszak.payments.dto;
 
-import com.twaszak.payments.dto.validators.CurrencyConversionConstraint;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import com.twaszak.payments.validators.CurrencyConversionConstraint;
+import lombok.*;
 
 import java.util.Optional;
 
@@ -13,6 +10,7 @@ import java.util.Optional;
 @AllArgsConstructor
 @Builder
 @CurrencyConversionConstraint
+@Getter
 public class CurrencyConversionDTO {
 
     private Optional<String> country;

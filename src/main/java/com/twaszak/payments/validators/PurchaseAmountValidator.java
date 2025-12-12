@@ -1,4 +1,4 @@
-package com.twaszak.payments.dto.validators;
+package com.twaszak.payments.validators;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;

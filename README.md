@@ -118,3 +118,26 @@ The location of the database can be updating the property:
 ## Actuator 
 This project has the spring boot actuator configured and a health check can be performed:
 http://localhost:8080/actuator/health
+
+
+
+## Docker
+ * Required Docker to be installed
+
+
+### Getting started
+    
+To build a docker image, first build the project:
+
+    $ mvn clean install
+
+To build a docker image, provided the version of the app your just built
+    
+    $ Docker build . --build-arg APP_VERSION=0.0.1-SNAPSHOT -t payment-app:latest
+
+Run the container on port 8080:
+    $ docker run -d -p 8080:8080 --name payment-app-5  payment-app:latest
+
+To stop the image, find the container id:
+    $ docker ps
+    $ docker stop ${container id}
