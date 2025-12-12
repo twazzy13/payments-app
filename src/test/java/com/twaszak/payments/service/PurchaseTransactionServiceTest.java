@@ -3,7 +3,6 @@ package com.twaszak.payments.service;
 import com.twaszak.payments.dto.PurchaseTransactionDTO;
 import com.twaszak.payments.model.PurchaseTransaction;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
@@ -25,7 +24,7 @@ class PurchaseTransactionServiceTest {
     PurchaseTransactionService service;
 
     @Test
-    void testSubmitTransaction() {
+    void testAddTransaction() {
         PurchaseTransactionDTO paymentDTO = PurchaseTransactionDTO.builder()
                 .purchaseAmount(new BigDecimal(30.3453))
                 .description("payment")
@@ -34,7 +33,7 @@ class PurchaseTransactionServiceTest {
 
 
 
-        PurchaseTransaction payment = service.submitTransaction(paymentDTO);
+        PurchaseTransaction payment = service.addTransaction(paymentDTO);
 
         assertEquals(2, payment.getPurchaseAmount().scale());
         assertEquals(new BigDecimal(30.35).setScale(2, RoundingMode.HALF_UP), payment.getPurchaseAmount());

@@ -1,6 +1,6 @@
 package com.twaszak.payments.model;
 
-import com.twaszak.payments.dto.PurchaseAmountConstraint;
+import com.twaszak.payments.dto.validators.PurchaseAmountConstraint;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
