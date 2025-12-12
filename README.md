@@ -60,7 +60,7 @@ Example Response:
     * `GET` Get a transaction by id and return a currency conversion for the transaction from USD to chosen coversion
 #### Request
 
-The request requires a value for either country or currency to 
+The request requires a value for either country or currency, both can be provided as well.
 
 | Field          | Data Type |                                                         Requirements |
 |:---------------|:---------:|---------------------------------------------------------------------:|
@@ -136,8 +136,10 @@ To build a docker image, provided the version of the app your just built
     $ Docker build . --build-arg APP_VERSION=0.0.1-SNAPSHOT -t payment-app:latest
 
 Run the container on port 8080:
+
     $ docker run -d -p 8080:8080 --name payment-app-5  payment-app:latest
 
 To stop the image, find the container id:
+
     $ docker ps
     $ docker stop ${container id}
